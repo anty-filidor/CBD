@@ -28,6 +28,10 @@ inference_NN = load(MODEL_PATH_NN)
 # Creation of the Flask app
 app = Flask(__name__)
 
+@app.route('/')
+def hello():
+    return 'Hello Docker!'
+
 # API 1
 # Flask route so that we can serve HTTP traffic on that route
 @app.route('/line/<Line>')
