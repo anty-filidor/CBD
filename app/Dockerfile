@@ -16,4 +16,3 @@ ENV MODEL_DIR=./my-model
 ENV MODEL_FILE_LDA=inference_lda.joblib
 ENV MODEL_FILE_NN=inference_nn.joblib
 
-RUN python3 api.py
