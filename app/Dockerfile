@@ -8,7 +8,6 @@ COPY inference_nn.joblib ./my-model/inference_nn.joblib
 COPY requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
 
-COPY train.csv ./train.csv
 COPY test.json ./test.json
 
 COPY api.py ./api.py
