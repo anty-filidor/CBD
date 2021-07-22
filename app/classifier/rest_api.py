@@ -16,7 +16,7 @@ utils.init_logger(Path("."))
 log = logging.getLogger(__name__)
 
 log.info("Preparing GPU or CPU for Tensorflow")
-utils.prepare_gpu()
+log.info(utils.prepare_gpu())
 
 log.info("Loading CBD model")
 model = model_handler.load_model(os.environ["MODEL_PATH"])
