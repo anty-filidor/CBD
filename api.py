@@ -33,11 +33,12 @@ app = Flask(__name__)
 @app.route('/line/<Line>')
 # Get data from json and return the requested row defined by the variable Line
 def line(Line):
-    with open('./test.json', 'r') as jsonfile:
-       file_data = json.loads(jsonfile.read())
+    # with open('./test.json', 'r') as jsonfile:
+    #    file_data = json.loads(jsonfile.read())
     # We can then find the data for the requested row and send it back as json
-    return json.dumps(file_data[Line])
-    
+    # return json.dumps(file_data[Line])
+    return json.dumps({"aaa": "bbb"})
+
 
 # API 2
 # Flask route so that we can serve HTTP traffic on that route
@@ -77,5 +78,7 @@ def score():
     return {'Score LDA': score_lda, 'Score Neural Network': score_nn}
 
 if __name__ == "__main__":
+    print("aaaa")
+    print(os.listdir("."))
     app.run(debug=True, host='0.0.0.0')
     
