@@ -4,28 +4,20 @@ import os
 import pathlib
 import time
 
-# mute tf logs below warning level and import it
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 import tensorflow as tf  # isort:skip  # noqa: E402
 
 
-def init_logger(log_dir: pathlib.Path, run_time: str = None) -> None:
+def init_logger(log_dir: pathlib.Path) -> None:
     """Initialise logger."""
-    # create log filename path
-    if run_time is None:
-        run_time = time.strftime("%d-%m-%Y_%H-%M-%S", time.localtime())
-    log_path = log_dir.joinpath(f"{run_time}.log")
+    run_time = time.strftime("%d-%m-%Y_%H-%M-%S", time.localtime())
 
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-
-    if os.path.exists(log_path):
-        os.remove(log_path)
+    log_dir.mkdir(parents=True, exist_ok=True)
+    log_path = log_dir.joinpath(f"CBD_{run_time}.log")
 
     # set logging file handler
     fh = logging.FileHandler(log_path)
     formatter = logging.Formatter(
-        fmt="[%(asctime)-19s] [%(levelname)s] - in: %(name)s.%(funcName)s "
+        fmt="[CBD APP] [%(asctime)-19s] [%(levelname)s] - in: %(name)s.%(funcName)s "
         'line: %(lineno)d, msg: "%(message)s"',
         datefmt="%Y-%m-%d %H:%M:%S",
     )
@@ -37,7 +29,7 @@ def init_logger(log_dir: pathlib.Path, run_time: str = None) -> None:
     # init logging basic config, which is available for all scripts
     logging.basicConfig(
         level=logging.INFO,
-        format='[%(asctime)-8s] [%(levelname)s] msg: "%(message)s"',
+        format='[CBD APP] [%(asctime)-8s] [%(levelname)s] msg: "%(message)s"',
         datefmt="%H:%M:%S",
         handlers=[ch, fh],
     )
