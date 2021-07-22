@@ -52,7 +52,7 @@ repos:
     hooks:
       - id: pytest
         name: unit tests
-        entry: python -m pytest -v -s
+        entry: python -m unittest -v
         "types": [python]
         verbose: true
         language: system
