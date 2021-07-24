@@ -8,7 +8,7 @@ def _uri_validator(url: str) -> bool:
     """Checks if given str is correct uri."""
     try:
         result = urlparse(url)
-        return all([result.scheme, result.netloc])
+        return all([result.scheme, result.netloc]) and " " not in url
     except ValueError:
         return False
 
@@ -17,8 +17,8 @@ def _prepare_failed_response(res: requests.models.Response) -> str:
     """Prepares human readable version of failed response."""
     return (
         f"Unsuccessful request! \n\t"
-        f" error code: {res.status_code}, \n\t"
-        f" response content {res.content}"
+        f" error code: {str(res.status_code)}, \n\t"
+        f" response content {str(res.content)}"
     )
 
 

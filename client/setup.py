@@ -11,7 +11,7 @@ setuptools.setup(
         "Programming Language :: Python :: 3.6",
         "License :: OSI Approved :: MIT License",
     ],
-    packages=["client"],
+    packages=["cbd_client"],
     python_requires=">=3.8",
     install_requires="requests==2.25.1",
 )
