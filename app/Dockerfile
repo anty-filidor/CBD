@@ -4,14 +4,14 @@ FROM tensorflow/tensorflow:2.2.3-gpu-py3
 WORKDIR /usr/src/app
 
 # Copy file with requirements
-COPY requirements.txt .
+COPY app/requirements.txt .
 
 # Copy all scripts required to run app
-COPY classifier ./classifier
-COPY main.py .
+COPY app/classifier ./classifier
+COPY app/main.py .
 
 # Copy model
-COPY dummy_model.joblib .
+COPY app/dummy_model.joblib .
 
 # Install required linux packages
 RUN apt update -y && apt install -y \
