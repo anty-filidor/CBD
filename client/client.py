@@ -76,12 +76,3 @@ class CBDClient:
             return res.json()["property"]
         else:
             return _prepare_failed_response(res)
-
-
-if __name__ == "__main__":
-    client = CBDClient("http://0.0.0.0:5000/")
-    client.set_up_connection()
-    print(client.hello())
-    print(client.classify_string("blablablabla"))
-    print(client.classify_string(3))  # type: ignore
-    print(client.get_model_info("xd"))
