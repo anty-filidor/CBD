@@ -1,4 +1,5 @@
 """Includes set of functions for handling the CDB api."""
+import urllib
 from urllib.parse import urljoin, urlparse
 
 import requests  # type: ignore
@@ -31,10 +32,12 @@ class CBDClient:
             raise ValueError(f"String {url} is not valid URL!")
         self.url = url
 
-    # TODO
-    def set_up_connection(self) -> None:
+    def check_connection(self) -> bool:
         """Check if app is accessible from given url in init."""
-        pass
+        if urllib.request.urlopen(self.url).getcode() == 200:
+            return True
+        else:
+            return False
 
     def hello(self) -> str:
         """Gets the api's welcome message."""
