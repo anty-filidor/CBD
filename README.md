@@ -40,7 +40,3 @@ python -m ipykernel install --user --name CBD
 ## Client
 
 ### Building the package
-
-pip install wheel pip install twine python setup.py bdist*wheel echo 'anty-filidor' |
-twine upload dist/* python -m twine upload -r SEM*Automation --config-file
-\$(PYPIRC_PATH) dist/*.whl
