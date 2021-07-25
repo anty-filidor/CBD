@@ -33,7 +33,10 @@ def test__prepare_failed_response(mo_resp):
 
 
 class TestCBDClient:
-    def test_set_up_connection(self):
+    def test_check_connection(self):
+        # TODO
+        # here we need do mock urllib.request.urlopen to return proper code and check it
+        # has been called once. We can parametrize this test to cover if statement
         pass
 
     @patch("requests.get", new_callable=MagicMock())
