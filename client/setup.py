@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="cbd_client",
-    version="0.0.2",
+    version="0.0.3",
     author="Michał Czuba",
     author_email="michal.czuba.1995@gmail.com",
     description="Package for remote connection with Cyber Bullying Detector",
