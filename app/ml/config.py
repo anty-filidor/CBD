@@ -4,7 +4,7 @@ import configparser
 class Parser:
     def __init__(self):
         self.parser = configparser.ConfigParser()
-        self.parser.read("params.ini")
+        self.parser.read("ml/params.ini")
 
     def get_section(self, section_name):
         return dict(self.parser.items(section_name))

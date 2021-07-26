@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
 from spacy.lang.pl import Polish
 
-from config import Parser
+from .config import Parser
 
 RE_EMOJI = re.compile('[\U00010000-\U0010ffff]', flags=re.UNICODE)
 
@@ -144,10 +144,3 @@ class Dataset:
     def chunks(inputs, outputs, batch_size):
         for i in range(0, len(inputs), batch_size):
             yield inputs[i:i + batch_size], outputs[i:i + batch_size]
-
-
-if __name__ == "__main__":
-    dt = Dataset("../data/task_6-2/training_set_clean_only_text.txt",
-                 "../data/task_6-2/training_set_clean_only_tags.txt",
-                 True, False, False)
-    # dt.prepare_flair_format("clean_text")

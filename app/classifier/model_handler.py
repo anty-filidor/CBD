@@ -3,17 +3,20 @@ import logging
 import os
 import random
 from typing import Any, Callable, Dict
-from unittest.mock import MagicMock
+from sklearn.pipeline import Pipeline
 
+import joblib
 from . import data_processing
 
 log = logging.getLogger(__name__)
 
 
-def load_model(model_path: str) -> Callable:
+def load_model(model_path: str) -> Pipeline:
     """Load model for further inference."""
     log.info(f"Path to model is {model_path}, exists? '{os.path.exists(model_path)}'.")
-    return MagicMock()
+    with open(model_path, "rb") as file:
+        model = joblib.load(file)
+    return model
 
 
 @data_processing.convert_result
