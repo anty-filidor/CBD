@@ -1,17 +1,20 @@
 import time
 from glob import glob
-from typing import Tuple
+from typing import List, Tuple
 
 import pandas as pd
 from dataset import Dataset
 from googletrans import Translator
 
 dataset_dir = "data"
-dataset_temp_dir = "enhanced_dataset"
+dataset_temp_dir = f"{dataset_dir}/enhanced_dataset"
 
 sub_corpus_name = "metadata.csv"
 text_corpus_path = f"{dataset_dir}/training_set_clean_only_text.txt"
 tag_corpus_path = f"{dataset_dir}/training_set_clean_only_tags.txt"
+
+enhanced_text_corpus_path = f"{dataset_dir}/training_set_texts.txt"
+enhanced_tag_corpus_path = f"{dataset_dir}/training_set_tags.txt"
 
 
 def extract_1_2_classes_from_corpus() -> None:
@@ -58,7 +61,8 @@ def enhance_corpus(batch_num: int) -> None:
     )
 
     with open(tags_path, "w", encoding="utf-8") as file:
-        file.write("\n".join(my_tags))
+        tt = "\n".join(my_tags)
+        file.write(tt + "\n")
 
     translator = Translator()
 
@@ -70,12 +74,9 @@ def enhance_corpus(batch_num: int) -> None:
             file.write(f"{pl_en_de_pl}\n")
 
 
-def _merge_batches(batch_type: str) -> Tuple[int, int]:
+def _merge_batches(batch_type: str) -> Tuple[List[str], int, int]:
     """Merges all batches of 'text' or 'tags' to one file."""
     batches = glob(f"{dataset_temp_dir}/*{batch_type}*.txt")
-    merged_batches_path = (
-        f"{dataset_dir}/training_set_clean_only_{batch_type}_enhanced.txt"
-    )
 
     merged_list = []
     for batch in batches:
@@ -83,19 +84,28 @@ def _merge_batches(batch_type: str) -> Tuple[int, int]:
             t = f_batch.readlines()
             merged_list += t
 
-    with open(merged_batches_path, "w", encoding="utf-8") as file:
-        file.write("".join(merged_list))
-
-    return len(batches), len(merged_list)
+    return merged_list, len(batches), len(merged_list)
 
 
 def merge_translated_corpus():
     """Merges created enhanced corpus into one additional file and validates results."""
-    tags_len_batches, tags_len_records = _merge_batches("tags")
-    text_len_batches, text_len_records = _merge_batches("text")
+    enhanced_tags, tags_len_batches, tags_len_records = _merge_batches("tags")
+    enhanced_texts, text_len_batches, text_len_records = _merge_batches("text")
 
     assert text_len_records == tags_len_records
     assert text_len_batches == tags_len_batches
+
+    with open(tag_corpus_path, "r", encoding="utf-8") as f_batch:
+        original_tags = f_batch.readlines()
+    original_tags += enhanced_tags
+    with open(enhanced_tag_corpus_path, "w", encoding="utf-8") as file:
+        file.write("".join(original_tags))
+
+    with open(text_corpus_path, "r", encoding="utf-8") as f_batch:
+        original_texts = f_batch.readlines()
+    original_texts += enhanced_texts
+    with open(enhanced_text_corpus_path, "w", encoding="utf-8") as file:
+        file.write("".join(original_texts))
 
 
 if __name__ == "__main__":
