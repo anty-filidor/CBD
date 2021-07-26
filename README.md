@@ -5,6 +5,14 @@ The
 article and the [source code](https://github.com/xaviervasques/Online_Inference) that
 was a skeleton of the final app.
 
+## ML Part
+
+To train final model I used source code of the winner of the PolEval 2019 competition -
+Maciej Biesek. His source code can be found
+[here](https://github.com/maciejbiesek/poleval-cyberbullying),
+
+`perl evaluate2.pl results.txt > output.txt`
+
 ### Building Docker image
 
 ```
