@@ -34,7 +34,7 @@ class Dataset:
             self.embeddings = self.get_embeddings(self.args['emb_path'])
 
     def build_dataframe(self, texts_file, tags_file):
-        with open(texts_file) as file:
+        with open(texts_file, encoding="utf-8") as file:
             lines = [line.strip() for line in file.readlines()]
             texts = pd.DataFrame(lines, columns=['text'])
         tags = pd.read_fwf(tags_file, header=None, names=['tag'])

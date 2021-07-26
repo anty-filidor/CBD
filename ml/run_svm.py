@@ -35,5 +35,5 @@ if __name__ == "__main__":
         dataset = Dataset(args.text_corpus, args.tag_corpus, False, True, False)
         tagged = model.tagging(dataset)
         tagged = [str(tag) for tag in tagged]
-        with open("results.txt", 'w') as file:
+        with open("data/results.txt", 'w') as file:
             file.write("\n".join(tagged))
