@@ -21,6 +21,11 @@ def unpack_input_data(data: Any) -> str:
         )
 
 
+def anonimise_data(raw_string: str) -> str:
+    """TODO - write finc that converts all tags to @anonimized_account."""
+    pass
+
+
 def convert_result(func: Callable) -> Callable:
     """
     Decorate model inference function by converting result to string.
