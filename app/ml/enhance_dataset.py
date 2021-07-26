@@ -3,8 +3,9 @@ from glob import glob
 from typing import List, Tuple
 
 import pandas as pd
-from dataset import Dataset
 from googletrans import Translator
+
+from .dataset import Dataset
 
 dataset_dir = "data"
 dataset_temp_dir = f"{dataset_dir}/enhanced_dataset"
