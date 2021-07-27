@@ -4,14 +4,13 @@ from glob import glob
 from typing import List, Tuple
 
 import pandas as pd
+from dataset import Dataset
 from googletrans import Translator
-
-from .dataset import Dataset
 
 dataset_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data/")
 dataset_temp_dir = f"{dataset_dir}/enhanced_dataset"
 
-sub_corpus_name = "metadata.csv"
+sub_corpus_name = f"{dataset_dir}/metadata.csv"
 text_corpus_path = f"{dataset_dir}/training_set_clean_only_text.txt"
 tag_corpus_path = f"{dataset_dir}/training_set_clean_only_tags.txt"
 
@@ -21,7 +20,7 @@ enhanced_tag_corpus_path = f"{dataset_dir}/training_set_tags.txt"
 
 def extract_1_2_classes_from_corpus() -> None:
     """Creates sub corpus that contains only cyberbullying and hate-speech classes."""
-    dataset = Dataset(text_corpus_path, tag_corpus_path, True, True, False)
+    dataset = Dataset(text_corpus_path, tag_corpus_path, True, True, True)
 
     new_dataset = dataset.df.copy()
     new_dataset = new_dataset.loc[new_dataset["tag"] != 0].reset_index()
@@ -49,7 +48,7 @@ def enhance_corpus(batch_num: int) -> None:
 
     print(f"Iteration {batch_num}, min_limit: {min_limit}, max_limit: {max_limit}")
 
-    ddf = pd.read_csv("metadata.csv")
+    ddf = pd.read_csv(sub_corpus_name)
     ddf = ddf.astype({"tag": str, "text": str})
     ddf = ddf.loc[min_limit:max_limit]
     my_texts = ddf["text"].to_list()

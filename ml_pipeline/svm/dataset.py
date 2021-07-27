@@ -12,6 +12,17 @@ WORD_DICT_PATH = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "data/word_dict.pickle"
 )
 
+amoniminimized_accounts_xddd = (
+    "@anonymized_account",
+    "@anonifikowane_account",
+    "@anonifikowany_account",
+    "@anonimizized_account",
+    "@anonimized_account",
+    "@anononymized_account",
+    "@anononized_account",
+    "@anonimized_aconimount",
+)
+
 
 class Dataset:
     """Container for dataset; this class is required to run the model."""
@@ -65,19 +76,30 @@ class Dataset:
     def _preprocess_sentence(self, sentence: str) -> List[str]:
         """Tokenize sentence and clears unnecessary tokens."""
         re_emoji = re.compile("[\U00010000-\U0010ffff]", flags=re.UNICODE)
+        sentence = sentence.lower()
+        amoniminimized_account_correct = "@anonymized_account"
         sentence = (
             sentence.replace(r"\n", "")
             .replace(r"\r", "")
             .replace(r"\t", "")
             .replace("„", "")
             .replace("”", "")
+            .replace("@anonymized_account", amoniminimized_account_correct)
+            .replace("@anonifikowane_account", amoniminimized_account_correct)
+            .replace("@anonifikowanym_account", amoniminimized_account_correct)
+            .replace("@anonifikowany_account", amoniminimized_account_correct)
+            .replace("@anonimizized_account", amoniminimized_account_correct)
+            .replace("@anonimized_account", amoniminimized_account_correct)
+            .replace("@anononymized_account", amoniminimized_account_correct)
+            .replace("@anononized_account", amoniminimized_account_correct)
+            .replace("@anonimized_aconimount", amoniminimized_account_correct)
         )
         doc = [tok for tok in self.nlp(sentence)]
         if not self.clean_data and str(doc[0]) == "RT":
             doc.pop(0)
-        while str(doc[0]) == "@anonymized_account":
+        while str(doc[0]) == amoniminimized_account_correct:
             doc.pop(0)
-        while str(doc[-1]) == "@anonymized_account":
+        while str(doc[-1]) == amoniminimized_account_correct:
             doc.pop()
         if self.remove_stopwords:
             doc = [tok for tok in doc if not tok.is_stop]
@@ -116,7 +138,8 @@ class Dataset:
         print(self.df["length"].quantile(0.95, interpolation="lower"))
         print(self.df["length"].quantile(0.99, interpolation="lower"))
         print(self.df.shape)
-        print(self.df["tag"].value_counts())
+        if self.is_train:
+            print(self.df["tag"].value_counts())
 
     @staticmethod
     def _text_tag_files_to_df(texts_file: str, tags_file: str) -> pd.DataFrame:
