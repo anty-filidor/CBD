@@ -33,7 +33,7 @@ class CBDClient:
         self.url = url
 
     def check_connection(self) -> bool:
-        """Check if app is accessible from given url in init."""
+        """Check if ml_pipeline is accessible from given url in init."""
         if urllib.request.urlopen(self.url).getcode() == 200:
             return True
         else:

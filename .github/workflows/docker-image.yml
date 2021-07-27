@@ -30,7 +30,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./app/Dockerfile
+          file: ./ml_pipeline/Dockerfile
           push: true
           tags: antyfilidor/cbd:latest
 

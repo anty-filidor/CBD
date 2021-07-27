@@ -16,7 +16,7 @@ RE_EMOJI = re.compile("[\U00010000-\U0010ffff]", flags=re.UNICODE)
 class Dataset:
     def __init__(
         self,
-        texts: Union[str, List[str]],
+        texts: Union[List[str], str],
         tags: Optional[str] = None,
         clean_data: bool = True,
         remove_stopwords: bool = False,
@@ -31,7 +31,7 @@ class Dataset:
         if self.is_train is True:
             self.df = self._build_dataframe_train(texts, tags)
         else:
-            self.df = self._build_dataframe_infer(texts)
+            self.df = self._build_dataframe_infer(texts)  # type:ignore
 
         self.word2idx, self.idx2word = self.build_dict()
 

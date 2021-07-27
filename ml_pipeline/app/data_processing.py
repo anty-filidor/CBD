@@ -23,7 +23,7 @@ def unpack_input_data(data: Any) -> str:
 
 def anonimise_data(raw_string: str) -> str:
     """TODO - write finc that converts all tags to @anonimized_account."""
-    pass
+    return raw_string
 
 
 def convert_result(func: Callable) -> Callable:

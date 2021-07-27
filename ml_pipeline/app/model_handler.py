@@ -1,13 +1,12 @@
 """Contains functions to inference the model."""
 import logging
 import os
-import random
 from typing import Any, Callable, Dict
 
 import joblib
-from ml.dataset import Dataset
-from ml.svm_classifier import tag_data
 from sklearn.pipeline import Pipeline
+from svm.dataset import Dataset
+from svm.svm_classifier import tag_data
 
 from . import data_processing
 
@@ -25,8 +24,10 @@ def load_model(model_path: str) -> Pipeline:
 @data_processing.convert_result
 def inference(text: str, model: Pipeline) -> int:
     """Perform classification of verified text on given model."""
-    text = Dataset(texts=[text], clean_data=True, remove_stopwords=True, is_train=False)
-    tokenized_text = text.df["tokens"].values
+    dataset = Dataset(
+        texts=[text], clean_data=False, remove_stopwords=False, is_train=False
+    )
+    tokenized_text = dataset.df["tokens"].values
     return tag_data(tokenized_text, model)[0]
 
 
@@ -34,7 +35,7 @@ def classify_text(raw_data: Dict[str, Any], model: Callable) -> Dict[str, str]:
     """
     Process data obtained from HTTP request.
 
-    :param raw_data: data obtained via flask app
+    :param raw_data: data obtained via flask ml_pipeline
 
     :param model: the model for classification
 

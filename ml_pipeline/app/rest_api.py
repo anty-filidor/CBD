@@ -28,7 +28,7 @@ app = Flask(__name__)
 @app.route("/")
 def hello() -> str:
     """
-    Print out message to see that app works.
+    Print out message to see that ml_pipeline works.
 
     :return: hello message
     """

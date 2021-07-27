@@ -4,14 +4,15 @@ FROM tensorflow/tensorflow:2.2.3-gpu-py3
 WORKDIR /usr/src/app
 
 # Copy file with requirements
-COPY app/requirements.txt .
+COPY ml_pipeline/requirements.txt .
 
-# Copy all scripts required to run app
-COPY app/classifier ./classifier
-COPY app/main.py .
+# Copy all scripts required to run ml_pipeline
+COPY ml_pipeline/app ./app
+COPY ml_pipeline/svm ./svm
+COPY ml_pipeline/start_app.py ./main.py
 
 # Copy model
-COPY app/dummy_model.joblib .
+COPY ml_pipeline/model.pkl .
 
 # Install required linux packages
 RUN apt update -y && apt install -y \
@@ -29,4 +30,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN export PATH="$PATH:/usr/local/bin/python"
 
 # Create environment variable for better handling a model
-ENV MODEL_PATH=/usr/src/app/dummy_model.joblib
+ENV MODEL_PATH=/usr/src/app/model.pkl
