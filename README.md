@@ -179,10 +179,10 @@ F-score and Macro-Average F-score over the PolEval testing dataset.
 
 ### Experiments & results
 
-After we obtained our first thought was to borrow idea from mrs Krasnowska-Kieraś and
-try to enhance available data to reduce imbalance. In order to do it we prepared
-dedicated script (`ml_pipeline/svm/enhance_dataset.py`) and implemented a pipeline that
-perform translating loop using Google Translator API. We obtained in this way additional
+After we reproduced mr Biesek's pipeline, our first thought was to borrow idea from mrs
+Krasnowska-Kieraś and try to enhance available data in order to reduce imbalance. In the
+additional script (`ml_pipeline/svm/enhance_dataset.py`) a pipeline that perform
+translating loop using Google Translator API was implemented. With it, we added about
 1500 tweets from two most niche classes, which changed the data distribution:
 
 <p align="center"><img src="docs/distr_enhanced_data.png" alt="enhanced dataset distr" width="400"/></p>
@@ -190,8 +190,6 @@ perform translating loop using Google Translator API. We obtained in this way ad
 The next idea that followed to improve the tweet processing and to remove some
 artifacts, especially from tweets that have been added to dataset. We did it by
 modification of `ml_pipeline/smv/svm_classifier.py`.
-
-Finally we obtained following model architecture: ![](docs/svm_diagram.png)
 
 Below we also present a set of results we obtained:
 
@@ -202,6 +200,11 @@ Below we also present a set of results we obtained:
 |       Dataset enhanced (PL>EN>DE>PL)        |       87.5       |       55.6       |
 |        Improved sentence processing         |       86.7       |       54.6       |
 | Dataset enhanced (PL>EN>DE>PL, PL>CZ>RU>PL) |       86.4       |       53.2       |
+
+Despite changes in the original pipeline, we decided to keep its main architecture, that
+can be presented in the diagram below:
+
+![](docs/svm_diagram.png)
 
 ## Machine learning - discussion
 
