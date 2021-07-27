@@ -44,9 +44,8 @@ def classify_text(raw_data: Dict[str, Any], model: Callable) -> Dict[str, str]:
     """
     log.info(f"Passed following data for classification {raw_data}")
     raw_string = data_processing.unpack_input_data(raw_data)
-    text_for_classification = data_processing.anonimise_data(raw_string)
 
-    pred_class = inference(text_for_classification, model)
+    pred_class = inference(raw_string, model)
     log.info(f"Predicted string as {pred_class}")
 
     return {"type": pred_class}

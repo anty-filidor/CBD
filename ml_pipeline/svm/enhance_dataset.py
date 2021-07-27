@@ -11,8 +11,8 @@ dataset_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data/")
 dataset_temp_dir = f"{dataset_dir}/enhanced_dataset"
 
 sub_corpus_name = f"{dataset_dir}/metadata.csv"
-text_corpus_path = f"{dataset_dir}/training_set_clean_only_text.txt"
-tag_corpus_path = f"{dataset_dir}/training_set_clean_only_tags.txt"
+text_corpus_path = f"{dataset_dir}/training_set_texts.txt"
+tag_corpus_path = f"{dataset_dir}/training_set_tags.txt"
 
 enhanced_text_corpus_path = f"{dataset_dir}/training_set_texts.txt"
 enhanced_tag_corpus_path = f"{dataset_dir}/training_set_tags.txt"
@@ -69,9 +69,9 @@ def enhance_corpus(batch_num: int) -> None:
 
     with open(text_path, "w", encoding="utf-8") as file:
         for text in my_texts:
-            pl_en = translator.translate(text, dest="en", src="pl").text
-            pl_en_de = translator.translate(pl_en, dest="de", src="en").text
-            pl_en_de_pl = translator.translate(pl_en_de, dest="pl", src="de").text
+            pl_en = translator.translate(text, dest="czech", src="pl").text
+            pl_en_de = translator.translate(pl_en, dest="ru", src="czech").text
+            pl_en_de_pl = translator.translate(pl_en_de, dest="pl", src="ru").text
             file.write(f"{pl_en_de_pl}\n")
 
 
@@ -99,13 +99,13 @@ def merge_translated_corpus():
     with open(tag_corpus_path, "r", encoding="utf-8") as f_batch:
         original_tags = f_batch.readlines()
     original_tags += enhanced_tags
-    with open(enhanced_tag_corpus_path, "w", encoding="utf-8") as file:
+    with open(enhanced_tag_corpus_path, "w+", encoding="utf-8") as file:
         file.write("".join(original_tags))
 
     with open(text_corpus_path, "r", encoding="utf-8") as f_batch:
         original_texts = f_batch.readlines()
     original_texts += enhanced_texts
-    with open(enhanced_text_corpus_path, "w", encoding="utf-8") as file:
+    with open(enhanced_text_corpus_path, "w+", encoding="utf-8") as file:
         file.write("".join(original_texts))
 
 
@@ -113,7 +113,7 @@ if __name__ == "__main__":
 
     extract_1_2_classes_from_corpus()
 
-    for batch in range(0, 10):
+    for batch in range(0, 9):
         enhance_corpus(batch)
         time.sleep(10)
 
