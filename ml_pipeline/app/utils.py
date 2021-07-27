@@ -4,8 +4,6 @@ import os
 import pathlib
 import time
 
-import tensorflow as tf  # isort:skip  # noqa: E402
-
 
 def init_logger(log_dir: pathlib.Path) -> None:
     """Initialise logger."""
@@ -37,6 +35,8 @@ def init_logger(log_dir: pathlib.Path) -> None:
 
 def prepare_gpu() -> str:
     """Set up hardware settings for tensorflow."""
+    import tensorflow as tf
+
     avail_num_gpus = len(tf.config.list_physical_devices("GPU"))
     if avail_num_gpus > 0:
         gpus = tf.config.experimental.list_physical_devices("GPU")

@@ -14,9 +14,11 @@ from . import utils  # isort:skip  # noqa: E402
 
 utils.init_logger(Path("."))
 log = logging.getLogger(__name__)
+log.info("Logger initialised successfully!")
 
-log.info("Preparing GPU or CPU for Tensorflow")
-log.info(utils.prepare_gpu())
+# uncomment if tensorflow docker image is used
+# log.info("Preparing GPU or CPU for Tensorflow")
+# log.info(utils.prepare_gpu())
 
 log.info("Loading CBD model")
 model = model_handler.load_model(os.environ["MODEL_PATH"])

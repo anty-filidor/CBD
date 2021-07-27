@@ -1,4 +1,5 @@
 FROM python:3.6-slim-buster
+# FROM tensorflow/tensorflow:2.2.3-gpu-py3
 
 # Set the working directory.
 WORKDIR /usr/src/app
