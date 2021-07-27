@@ -1,4 +1,4 @@
-# CYBER BULLYING END-TO-END ML APP
+# CYBER BULLYING DETECTION END-TO-END ML APP
 
 This repository contains source code for simple end-to-end cyberbullying detector
 application. Produced artifacts are deployed in the following way:
@@ -13,7 +13,7 @@ one of following classes (non-harmful, cyberbullying, hate_speech).
 
 ## TLDR
 
-In order to see how the app works go to 'demo' folder and follow the manual.
+In order to see how the app works go to `demo` folder and follow the manual.
 
 ## Contents of repository
 
@@ -31,7 +31,7 @@ Repository consists of following modules:
 
 ### Client
 
-This module contains source code of the 'cbd-client' package.
+This module contains source code of the `cbd-client` package.
 
 ### Demo
 
@@ -41,8 +41,8 @@ Simple manual of environment configuration is also attached.
 ### ML Pipeline
 
 This module contains source code of the web application and machine learning aspects of
-the project. The 'app' directory stores the Flask application. The 'svm' directory
-stores the entire machine learning 'pipeline' to (1) produce dataset, (2) train model,
+the project. The `app` directory stores the Flask application. The `svm` directory
+stores the entire machine learning `pipeline` to (1) produce dataset, (2) train model,
 (3) inference the model. It also includes data sets and evaluation scripts.
 
 ## Artifacts
@@ -52,7 +52,8 @@ Entire codebase is designed to produce three, following artifacts:
 - **Machine Learning model** that classify input tweets as non-harmful, cyberbullying or
   hate_speech (can be found directly [in the repo](ml_pipeline/model.pkl))
 - **Docker image** which contains the web application that serves the model inference
-  (can be found [on Docker Hub](https://hub.docker.com/r/antyfilidor/cbd))
+  (can be found [on Docker Hub](https://hub.docker.com/r/antyfilidor/cbd)); it's good to
+  mention that is weights only about 200 MB
 - **Python package** which facilitates clients to connect with application service and
   query the api to inference model (can be found
   [on PyPi](https://pypi.org/project/cbd-client/))
@@ -62,7 +63,7 @@ Entire codebase is designed to produce three, following artifacts:
 To facilitate the integration works we decided to implement two CI pipelines, so that
 main artifacts can be automatically built. Due to the fact that GitHub was chosen as
 DevOps platform, we implemented, so called, GitHub Actions. They are stored in the
-'.github' folder.
+`.github` folder.
 
 `docker-image.yml` includes pipeline that automatically builds docker image that
 contains the application to serve the CBD model. After docker image is built, the
@@ -99,3 +100,107 @@ are aware that there are many things that can be done in the future in this fiel
 - prepare documentation of the code and publish it online (use e.g.
   [Sphinx](https://www.sphinx-doc.org/en/master/) and
   [Read the Docs](https://readthedocs.org/) server).
+
+## Machine learning - model choice rationale
+
+The Machine learning model is an integral part of entire solution. Therefore, in order
+to determine the way should be designed, one must balance between many factors. Of
+course, we can exclude entire business domain, because the purpose of this
+implementation is to prepare end-to-end solution in short time, with no budget, and by
+one person. Nonetheless, factors like available data and its quality, computational
+power, simplicity of model and so on must be taken into account. Hence, we determined a
+following approach.
+
+### Analysis of existing solutions
+
+In this step we searched for articles and web tutorials how this problem is being
+solved. Of course there are many existing solutions, but no for Polish language.
+
+Hopefully the results from PolEval 2019 competition were
+[available](http://2019.poleval.pl/files/poleval2019.pdf), and that helped a lot in
+further development. The chapter "Results of the PolEval 2019 Shared Task 6: First
+Dataset and Open Shared Task for Automatic Cyberbullying Detection in Polish Twitter"
+described in comprehensive way the way dataset was collected and from high level point
+of view submitted solutions by competitors. The
+[result table](http://2019.poleval.pl/index.php/results/) contained names of models, and
+a score they gained. Moreover, the description of Task 6.2 (the very same this project
+implements) contained the evaluation script written in Pearl to assess the model. We
+noted particularly two submissions - the winning one (Maciej Biesek's), and the one
+presented by Katarzyna Krasnowska-Kieraś and Alina Wróblewska. First was interesting
+because of the fact, that mr Biesek tested three different models, and the simplest
+turned out to be the best in the entire competition. The approach presented by ladies
+mentioned above was interesting, because it showed a very interesting way to enhance the
+dataset.
+
+### Dataset overview
+
+In order to analyse the dataset we decided first to read collected tweets. All of them
+were anonimized (the account name has been replaced with '@anonymized_account'). Dataset
+included emoticons, that can be helpful in detection of their emotional content.
+However, contrary to authors of the dataset, it has not been cleaned very well. There
+were a lot of tweets that contained a special-escape characters, like '\\n' '\'' etc.
+Their presence was certainly related with encoding mismatch during pulling tweets via
+api, and it couldn't been easily fixed in preprocessing pipeline.
+
+The second thing was the analysis of classes distribution. In order to do it we plotted
+following bar plots via Matplotlib:
+
+| ![](docs/distr_train_dataset.png)  | ![](docs/distr_test_dataset.png)  |
+| :--------------------------------: | :-------------------------------: |
+| Classes distribution in train data | Classes distribution in test data |
+
+As we can see, the original dataset was highly imbalanced, and that sould be taken into
+account during implementation.
+
+### Selection of a baseline model
+
+As a baseline we decided to base on code of Maciej Biesek, who won the competition. He
+uploaded three different algorithms - supported vector machine (1st place), recurrent
+neural network (6th place) and Flair model (4th place). Eventually we decided to use the
+SVM because of its performance and simplicyty (e.g. we expected to obtain light model).
+
+Entire [code](https://github.com/maciejbiesek/poleval-cyberbullying) is available on
+GitHub. We must admit, it contains very clear scripts, which, considering its prototype
+character, facilitates understanding of his approach.
+
+### Inference with existing models
+
+Mr Biesek’s repository doesn't contain any listing of libraries, that made us difficult
+to reproduce the python environment. Fortunately we had serialised models there, and
+that was an ‘anchor point’ for recreating step. After it was completed, we successfully
+ran SVM and obtained the same values of metrics as are listed in official results. We
+also trained a new one with no modification of the code which resulted in the same way.
+
+### Choice of validation metrics
+
+Since we decided to 'get inspired' by PolEval competitors, the usage of its evaluation
+script became natural. Therefore, to validate obtained models we computed Micro-Average
+F-score and Macro-Average F-score over the PolEval testing dataset.
+
+### Experiments & results
+
+After we obtained our first thought was to borrow idea from mrs Krasnowska-Kieraś and
+try to enhance available data to reduce imbalance. In order to do it we prepared
+dedicated script (`ml_pipeline/svm/enhance_dataset.py`) and implemented a pipeline that
+perform translating loop using Google Translator API. We obtained in this way additional
+1500 tweets from two most niche classes, which changed the data distribution:
+
+<p align="center"><img src="docs/distr_enhanced_data.png" alt="enhanced dataset distr" width="400"/></p>
+
+The next idea that followed to improve the tweet processing and to remove some
+artifacts, especially from tweets that have been added to dataset. We did it by
+modification of `ml_pipeline/smv/svm_classifier.py`.
+
+Finally we obtained following model architecture: ![](docs/svm_diagram.png)
+
+Below we also present a set of results we obtained:
+
+|                 Model name                  | Micro-Average F1 | Macro-Average F1 |
+| :-----------------------------------------: | :--------------: | :--------------: |
+|         PolEval2019 Baseline model          |       87.6       |       51.8       |
+|            PolEval2019 Own model            |       87.7       |       52.0       |
+|       Dataset enhanced (PL>EN>DE>PL)        |       87.5       |       55.6       |
+|        Improved sentence processing         |       86.7       |       54.6       |
+| Dataset enhanced (PL>EN>DE>PL, PL>CZ>RU>PL) |       86.4       |       53.2       |
+
+## Machine learning - discussion
