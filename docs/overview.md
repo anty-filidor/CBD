@@ -35,6 +35,8 @@ root@instance-1:~# sudo docker run -it -p 5000:5000 antyfilidor/cbd python3 main
 [CBD APP] [13:58:56] [INFO] msg: " * Debugger PIN: 144-196-665"
 ```
 
+## Validate results of model
+
 `perl ml_pipeline/svm/evaluate2.pl ml_pipeline/svm/data/results.txt > ml_pipeline/svm/data/output.txt`
 
 ## Setting up the environment
@@ -60,11 +62,3 @@ pip install -r requirements.dev.txt
 ```
 python -m ipykernel install --user --name CBD
 ```
-
-## Client
-
-### Building the package
-
-## References:
-
-[references](docs/references.md)
