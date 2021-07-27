@@ -1,27 +1,44 @@
+import os
 import pickle
 import re
 import string
 from collections import Counter
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Tuple, Union
 
-import numpy as np
 import pandas as pd
 from spacy.lang.pl import Polish
 
-from . import params
-
-RE_EMOJI = re.compile("[\U00010000-\U0010ffff]", flags=re.UNICODE)
+WORD_DICT_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "data/word_dict.pickle"
+)
 
 
 class Dataset:
+    """Container for dataset; this class is required to run the model."""
+
     def __init__(
         self,
         texts: Union[List[str], str],
         tags: Optional[str] = None,
-        clean_data: bool = True,
+        clean_data: bool = False,
         remove_stopwords: bool = False,
-        is_train: bool = True,
+        is_train: bool = False,
     ):
+        """
+        Initialises the Dataset object.
+
+        Depending on mode (training or inference) it stores and preprocess corpus and
+        tags attached to each sentence.
+
+        :param texts:
+        :param tags: path to text file with tags for dataset; use only if training
+        :param clean_data: a flag - if true data is cleaned (i.e. small sentences are
+            removed; use only if training
+        :param remove_stopwords: a flag - if true stopwords are removed from tokenized
+            sentence; use only if training
+        :param is_train: a flag that indicates if dataset is created for training or to
+            inference the model
+        """
         self.clean_data = clean_data
         self.remove_stopwords = remove_stopwords
         self.is_train = is_train
@@ -29,37 +46,25 @@ class Dataset:
         self.nlp = Polish()
 
         if self.is_train is True:
-            self.df = self._build_dataframe_train(texts, tags)
+            _df = self._text_tag_files_to_df(texts, tags)  # type:ignore
         else:
-            self.df = self._build_dataframe_infer(texts)  # type:ignore
+            _df = pd.DataFrame(texts, columns=["text"])
 
-        self.word2idx, self.idx2word = self.build_dict()
+        self.df = self._build_dataframe(_df)
+        self.word2idx, self.idx2word = self._build_dict()
 
-    def _build_dataframe_train(self, texts_file, tags_file):
-        with open(texts_file, encoding="utf-8") as file:
-            lines = [line.strip() for line in file.readlines()]
-            texts = pd.DataFrame(lines, columns=["text"])
-        tags = pd.read_fwf(tags_file, header=None, names=["tag"])
-        df = pd.concat([texts, tags], axis=1)
+    def _build_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Add to corpus dataframe parameters for model inference."""
         df["tokens"] = df["text"].map(lambda x: self._preprocess_sentence(x))
         df["length"] = df["tokens"].map(lambda x: len(x))
         df["clean_text"] = df["tokens"].map(lambda x: " ".join(x))
         if self.clean_data:
-            df = self.clean(df)
+            df = self._clean(df)
         return df
 
-    def _build_dataframe_infer(self, lines: List[str]):
-
-        df = pd.DataFrame(lines, columns=["text"])
-
-        df["tokens"] = df["text"].map(lambda x: self._preprocess_sentence(x))
-        df["length"] = df["tokens"].map(lambda x: len(x))
-        df["clean_text"] = df["tokens"].map(lambda x: " ".join(x))
-        if self.clean_data:
-            df = self.clean(df)
-        return df
-
-    def _preprocess_sentence(self, sentence):
+    def _preprocess_sentence(self, sentence: str) -> List[str]:
+        """Tokenize sentence and clears unnecessary tokens."""
+        re_emoji = re.compile("[\U00010000-\U0010ffff]", flags=re.UNICODE)
         sentence = (
             sentence.replace(r"\n", "")
             .replace(r"\r", "")
@@ -81,30 +86,32 @@ class Dataset:
             "".join(c for c in tok if not c.isdigit() and c not in string.punctuation)
             for tok in doc
         ]
-        doc = [RE_EMOJI.sub(r"", tok) for tok in doc]
+        doc = [re_emoji.sub(r"", tok) for tok in doc]
         doc = [tok.strip() for tok in doc if tok.strip()]
         return doc
 
-    def build_dict(self):
+    def _build_dict(self) -> Tuple[Dict[str, int], Dict[int, str]]:
+        """Reads mappings of words to indices."""
         if self.is_train:
             sentences = self.df["tokens"]
             all_tokens = [token for sentence in sentences for token in sentence]
             words_counter = Counter(all_tokens).most_common()
-            word2idx = {params.pad: 0, params.unk: 1}
+            word2idx = {"<PAD>": 0, "<UNK>": 1}
             for word, _ in words_counter:
                 word2idx[word] = len(word2idx)
 
-            with open(params.word_dict_path, "wb") as dict_file:
+            with open(WORD_DICT_PATH, "wb") as dict_file:
                 pickle.dump(word2idx, dict_file)
 
         else:
-            with open(params.word_dict_path, "rb") as dict_file:
+            with open(WORD_DICT_PATH, "rb") as dict_file:
                 word2idx = pickle.load(dict_file)
 
         idx2word = {idx: word for word, idx in word2idx.items()}
         return word2idx, idx2word
 
-    def print_stats(self):
+    def print_stats(self) -> None:
+        """Print statistics about model."""
         print(self.df["length"].describe())
         print(self.df["length"].quantile(0.95, interpolation="lower"))
         print(self.df["length"].quantile(0.99, interpolation="lower"))
@@ -112,11 +119,17 @@ class Dataset:
         print(self.df["tag"].value_counts())
 
     @staticmethod
-    def get_random_emb(length):
-        return np.random.uniform(-0.25, 0.25, length)
+    def _text_tag_files_to_df(texts_file: str, tags_file: str) -> pd.DataFrame:
+        """Read out corpus and tags from paths and concatenate to dataframe."""
+        with open(texts_file, encoding="utf-8") as file:
+            lines = [line.strip() for line in file.readlines()]
+            texts = pd.DataFrame(lines, columns=["text"])
+        tags = pd.read_fwf(tags_file, header=None, names=["tag"])
+        return pd.concat([texts, tags], axis=1)
 
     @staticmethod
-    def clean(dataframe):
+    def _clean(dataframe: pd.DataFrame) -> pd.DataFrame:
+        """Clean the data from one token tweets and retweets."""
         dataframe = dataframe.drop_duplicates("clean_text")
         return dataframe[
             (dataframe["tokens"].apply(lambda x: "rt" not in x[:1]))

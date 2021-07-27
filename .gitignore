@@ -5,3 +5,5 @@
 build/*
 dist/*
 cbd_client.egg-info/*
+/ml_pipeline/svm/data/output.txt
+/ml_pipeline/svm/data/results.txt

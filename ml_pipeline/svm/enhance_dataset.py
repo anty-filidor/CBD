@@ -1,3 +1,4 @@
+import os
 import time
 from glob import glob
 from typing import List, Tuple
@@ -7,7 +8,7 @@ from googletrans import Translator
 
 from .dataset import Dataset
 
-dataset_dir = "data"
+dataset_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data/")
 dataset_temp_dir = f"{dataset_dir}/enhanced_dataset"
 
 sub_corpus_name = "metadata.csv"
