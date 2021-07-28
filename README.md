@@ -33,6 +33,10 @@ Repository consists of following modules:
 
 This module contains source code of the `cbd-client` package.
 
+### Docs
+
+This module contains images that are rendered here.
+
 ### Demo
 
 This module contains the Jupyter Notebook that shows how the solution works in reality.
@@ -42,7 +46,7 @@ Simple manual of environment configuration is also attached.
 
 This module contains source code of the web application and machine learning aspects of
 the project. The `app` directory stores the Flask application. The `svm` directory
-stores the entire machine learning `pipeline` to (1) produce dataset, (2) train model,
+stores the entire machine learning "pipeline" to (1) produce dataset, (2) train model,
 (3) inference the model. It also includes data sets and evaluation scripts.
 
 ## Artifacts
@@ -94,7 +98,7 @@ are aware that there are many things that can be done in the future in this fiel
 - modify rest api so that it can also handle batch requests,
 - modify the `docker-image.yml` so that it can automatically update docker image on the
   GCP machine,
-- in case of need to change model do deep one we can consider using GCP machine and
+- in case of need to change model do deep one, we can consider using GCP machine and
   Docker image that supports GPU acceleration,
 - check all licenses of used libraries (use e.g. [FOSSA](https://fossa.com/) tool),
 - prepare documentation of the code and publish it online (use e.g.
@@ -129,13 +133,13 @@ noted particularly two submissions - the winning one (Maciej Biesek's), and the 
 presented by Katarzyna Krasnowska-Kieraś and Alina Wróblewska. First was interesting
 because of the fact, that mr Biesek tested three different models, and the simplest
 turned out to be the best in the entire competition. The approach presented by ladies
-mentioned above was interesting, because it showed a very interesting way to enhance the
+mentioned above was interesting, because it showed a very promising way to enhance the
 dataset.
 
 ### Dataset overview
 
 In order to analyse the dataset we decided first to read collected tweets. All of them
-were anonimized (the account name has been replaced with '@anonymized_account'). Dataset
+were anonimised (the account name has been replaced with '@anonymized_account'). Dataset
 included emoticons, that can be helpful in detection of their emotional content.
 However, contrary to authors of the dataset, it has not been cleaned very well. There
 were a lot of tweets that contained a special-escape characters, like '\\n' '\'' etc.
@@ -149,7 +153,7 @@ following bar plots via Matplotlib:
 | :--------------------------------: | :-------------------------------: |
 | Classes distribution in train data | Classes distribution in test data |
 
-As we can see, the original dataset was highly imbalanced, and that sould be taken into
+As we can see, the original dataset was highly imbalanced, and that should be taken into
 account during implementation.
 
 ### Selection of a baseline model
@@ -157,7 +161,7 @@ account during implementation.
 As a baseline we decided to base on code of Maciej Biesek, who won the competition. He
 uploaded three different algorithms - supported vector machine (1st place), recurrent
 neural network (6th place) and Flair model (4th place). Eventually we decided to use the
-SVM because of its performance and simplicyty (e.g. we expected to obtain light model).
+SVM because of its performance and simplicity (e.g. we expected to obtain light model).
 
 Entire [code](https://github.com/maciejbiesek/poleval-cyberbullying) is available on
 GitHub. We must admit, it contains very clear scripts, which, considering its prototype
@@ -207,6 +211,33 @@ can be presented in the diagram below:
 ![](docs/svm_diagram.png)
 
 ## Machine learning - discussion
+
+In the pipeline we skipped step of parameters tuning. It has been done because of lack
+of time, anyway we can (wih small effort) use some out of the box methods provided in
+`Scikit Image` like
+[Grid search](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV),
+[Randomized search](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.RandomizedSearchCV.html#sklearn.model_selection.RandomizedSearchCV)
+. With them, we will be able to obtain parameters of the model that result with the best
+performance of classifier on given dataset. In case it won't be to do it on the complex
+classifier (like the sklearn Pipeline) we can do it only on SVC.
+
+We can also use
+[K-fold cross validation with stratification](https://scikit-learn.org/stable/modules/cross_validation.html)
+to improve model fitting.
+
+Continuing with dataset improvment is also a good idea. Machine translations that has
+been done with Google Translate API were not perfect and quite messy. Therefore, we can
+try to simplify them by removing one step, for instance instead of pl->en->de->pl go
+with pl->en->pl. We can also use only West Slavic languages (Czech, Slovakian,
+Lausitzian) to improve the quality of translations.
+
+Originally, we intended to test more algorithms than one, but lack of time made it
+impossible. The most interesting would be implementing a RNN like LSTM (especially that
+we have a baseline from PolEval 2019). We can also use some pre-trained models and
+perform the transfer-learning ( like [n-waves](https://github.com/n-waves/multifit)).
+
+In case of promising results we can think of ensembling those classifiers to improve
+results.
 
 ## References
 
